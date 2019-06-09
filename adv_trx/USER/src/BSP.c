@@ -74,7 +74,8 @@ void SPIM_Init(void)
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(GPIOC,&GPIO_InitStruct);
     
-
+    GPIO_SetBits(GPIOC,GPIO_Pin_4);
+    
     GPIO_PinAFConfig(GPIOC,GPIO_PinSource5,GPIO_AF_SPI_CLK_PC5); //Spiclk
     GPIO_PinAFConfig(GPIOD,GPIO_PinSource2,GPIO_AF_SPI_MISO_PD2); //Spimiso
     GPIO_PinAFConfig(GPIOC,GPIO_PinSource6,GPIO_AF_SPI_MOSI_PC6); //Spimosi
