@@ -141,7 +141,7 @@ void SRRC_PRBS9Test(unsigned char freq)
 
     SPI_Write_Reg(0x20|0x04,0x00);
 
-    SPI_Write_Buffer(0x0a, (uint8_t*)AccessAddr, 4);
+    SPI_Write_Buffer(0x10, (uint8_t*)AccessAddr, 4);
     SPI_Write_Reg(0x20|0x03,0x02);
     SPI_Write_Reg(0x20|0x00,0x0e);
     SPI_Write_Reg(0x20|0x06,0x06); //for cont wave
@@ -230,4 +230,48 @@ void Carrier(unsigned char freq)
     SPI_Write_Reg(0x26, 0x96);
 
     SPI_Write_Reg(0x50, 0x53);
+}
+
+void RXTest(unsigned char freq)
+{
+    unsigned long delay=0x14000;
+    unsigned char temp[32];
+
+    SPI_Write_Reg(0x50, 0x51);
+    
+    SPI_Write_Reg(0x20,0x78);
+    SPI_Write_Reg(0x25,freq);
+    SPI_Write_Reg(0x50, 0x53);
+    SPI_Write_Reg(0x36, 0x8c);
+    SPI_Write_Reg(0x20|0x1d, 0x1c);
+    while(delay--);//Delay>10ms
+
+    SPI_Write_Reg(0x50, 0x51);
+    SPI_Write_Reg(0x20,0x7a);
+    SPI_Write_Reg(0x50, 0x53);
+    SPI_Write_Reg(0x20|0x1d, 0x1e);
+
+    delay=0x14000;
+    while(delay--);//Delay>10ms
+
+    SPI_Write_Reg(0x50, 0x56);
+    SPI_Write_Reg(0x20,0x0);
+
+    SPI_Write_Reg(0x50, 0x51);
+
+    SPI_Write_Reg(0x20|0x01,0x00);
+
+    SPI_Write_Reg(0x20|0x04,0x00);
+
+    SPI_Write_Buffer(0x0a, (uint8_t*)AccessAddr, 4);
+    SPI_Write_Reg(0x20|0x03,0x02);
+    
+    SPI_Write_Reg(0x20|0x11,0x20);
+    SPI_Write_Reg(0x20|0x00,0x03);
+
+    SPI_Write_Reg(0x50, 0x53);
+    SPI_Write_Reg(0x20|0x16, 0x8e);
+    
+    SPI_Write_Reg(0x50, 0x51);
+    
 }
