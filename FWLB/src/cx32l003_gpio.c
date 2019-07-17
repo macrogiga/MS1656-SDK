@@ -110,6 +110,14 @@ void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef * GPIO_InitStruct)
 				GPIOx->OTYP &= ~((GPIO_OTYPER_OT_0) << ((uint8_t)pinpos)) ;
 				GPIOx->OTYP |= (uint32_t)(((uint32_t)GPIO_InitStruct->GPIO_OType) << ((uint8_t)pinpos));
 			}
+			else
+			{
+				if(GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IN)
+				{
+				   /*set gpio direction*/
+				   GPIOx->DIR &= ~(GPIO_PIN_OUT_MODE<<(uint8_t)pinpos);
+				}
+			}
 			/* Pull-up Pull down resistor configuration*/
 			GPIOx->PUPD &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
 			GPIOx->PUPD |= (((uint32_t)GPIO_InitStruct->GPIO_PuPd) << (pinpos * 2));

@@ -275,19 +275,3 @@ void ClkTrim_ClearFlagStatus(CLKTRIM_TypeDef*CLKTRIMx, uint16_t CLKTRIM_FLAG)
 
 /************************ (C) COPYRIGHT cx32l003 *****END OF FILE****/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -44,16 +44,14 @@ void RCC_DeInit(void)
   */
 void RCC_HIRCTrim(RCC_TypeDef *RCCx,uint32_t RCC_HIRCCR)
 {
+	uint32_t HIRC_KEY;
 	/*Check the parameters */
 	assert_param(IS_RCC_ALL_PERIPH(RCCx));
-
+	HIRC_KEY = RCC_HIRCCLK_KEY;
 	/*Close the lock of register*/
 	RCCx->REGLOCK = RCC_REGLOCKKEY;
-
 	/*Set the Triming value to the HIRCCR register*/
-	RCCx->HIRCCR &= ~RCC_HIRC_TRIM_MASK;
-	RCCx->HIRCCR |= RCC_HIRCCR;
-	
+	RCCx->HIRCCR = HIRC_KEY|RCC_HIRCCR;
 	/*Open the lock of register*/
 	RCCx->REGLOCK = RCC_RESGLOCKKEY;
 }
@@ -66,15 +64,15 @@ void RCC_HIRCTrim(RCC_TypeDef *RCCx,uint32_t RCC_HIRCCR)
   */
 void RCC_LIRCTrim(RCC_TypeDef *RCCx,uint32_t RCC_LIRCCR)
 {
+	   uint32_t LIRC_KEY;
 		/*Check the parameters */
 	  assert_param(IS_RCC_ALL_PERIPH(RCCx));
-	
+	  LIRC_KEY = RCC_LIRCCLK_KEY;
 	  /*Close the lock of register*/
 	  RCCx->REGLOCK = RCC_REGLOCKKEY;
 	
 	  /*Set the Triming value to the LIRCCR register*/
-	  RCCx->LIRCCR &= ~RCC_LIRC_TRIM_MASK;
-		RCCx->LIRCCR |= RCC_LIRCCR;
+		RCCx->LIRCCR = LIRC_KEY|RCC_LIRCCR;
 	  
 	  /*Open the lock of register*/
 	  RCCx->REGLOCK = RCC_RESGLOCKKEY;
@@ -102,8 +100,8 @@ void RCC_SetHXTDrive(RCC_TypeDef *RCCx,uint32_t HXTCKL,uint32_t HXTDRIVER)
 	RCCx->REGLOCK = RCC_REGLOCKKEY;
 	
 	/*Set the value of driver to the HXTCR register*/
-	RCCx->HXTCR &= ~RCC_HXT_DRIVER_MASK;
-	RCCx->HXTCR |= HXTDRIVER1;
+
+	RCCx->HXTCR  = RCC_HXTCLK_KEY|HXTDRIVER1;
 	
 	/*Open the lock of register*/
 	RCCx->REGLOCK = RCC_RESGLOCKKEY;	
@@ -129,8 +127,7 @@ void RCC_SetLXTDrive(RCC_TypeDef *RCCx,uint8_t LXTAM,uint8_t LXTDRIVER)
 	RCCx->REGLOCK = RCC_REGLOCKKEY;
 	
 	/*Set the value of driver to the LXTCR register*/
-	RCCx->HXTCR &= ~RCC_LXT_DRIVER_MASK;
-	RCCx->HXTCR |= LXTDRIVER1;
+	RCCx->LXTCR  = RCC_LXTCLK_KEY|LXTDRIVER1;
 	
 	/*Open the lock of register*/
 	RCCx->REGLOCK = RCC_RESGLOCKKEY;	
@@ -191,8 +188,8 @@ ErrorStatus RCC_WaitForHXTStable(RCC_TypeDef *RCCx,uint8_t PERIOD)
 	/*Close the lock of register*/
 	RCCx->REGLOCK = RCC_REGLOCKKEY;
 	/*Set HXT STARTUP*/
-	RCCx->HXTCR &= ~RCC_HXT_STARTUP_MASK;
-	RCCx->HXTCR |= PERIOD;
+
+	RCCx->HXTCR = RCC_HXTCLK_KEY|PERIOD;
 	
   /* Wait till HXT STABLE*/
   do
@@ -236,8 +233,8 @@ ErrorStatus RCC_WaitForLIRCStable(RCC_TypeDef *RCCx,uint8_t PERIOD)
 	/*Close the lock of register*/
 	RCCx->REGLOCK = RCC_REGLOCKKEY;
 	/*Set LIRC STARTUP*/
-	RCCx->LIRCCR &= ~RCC_LIRC_STARTUP_MASK;
-	RCCx->LIRCCR|= PERIOD;
+
+	RCCx->LIRCCR = RCC_LIRCCLK_KEY|PERIOD;
 	
   /* Wait till LIRC STABLE*/
   do
@@ -311,7 +308,7 @@ void RCC_LXTCmd(RCC_TypeDef *RCCx,LXT_InitTypeDef *LXT_InitStruct)
 {
 	/*Check the parameters */
   uint32_t tmp =0,tmp1 =0;
-	uint32_t key = 0x5a690000;
+
 	
 	/*Set the parameters of LXT register */
 	tmp1 = ((LXT_InitStruct->LXAON<<10)|\
@@ -322,7 +319,7 @@ void RCC_LXTCmd(RCC_TypeDef *RCCx,LXT_InitTypeDef *LXT_InitStruct)
 	       (LXT_InitStruct->LXTSTARTUP<<4));
 	
   /*Set the vlaue for lxt */	
-	tmp = key|tmp1;
+	tmp = RCC_LXTCLK_KEY|tmp1;
 	
 	/*Close the lock of register*/
 	RCCx->REGLOCK = RCC_REGLOCKKEY;
@@ -352,10 +349,10 @@ void RCC_SetX32KPort(RCC_TypeDef *RCCx,FunctionalState NewState)
 	
 	if(NewState!= DISABLE)
 		/*Enable the 32k port*/
-		RCCx->LXTCR |= RCC_X32K_PORT_EN; 
+		RCCx->LXTCR  = RCC_LXTCLK_KEY|RCC_X32K_PORT_EN; 
 	else
 		/*Enable the GPIO port*/
-		RCCx->LXTCR &= ~RCC_X32K_PORT_EN;
+		RCCx->LXTCR  = RCC_LXTCLK_KEY;
 	
 	/*Open the lock of register*/
 	RCCx->REGLOCK = RCC_RESGLOCKKEY;	

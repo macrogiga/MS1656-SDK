@@ -4,6 +4,7 @@
 #include "cx32l003_gpio.h"
 #include "cx32l003_spi.h"
 #include "cx32l003_exti.h"
+#include "cx32l003_flash.h"
 #include "misc.h"
 
 #include "Spi.h"

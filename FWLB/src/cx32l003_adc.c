@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    stm32f4xx_adc.c
+  * @file    cx32l003_adc.c
   * @author  MCD Application Team
   * @version V0.0.0
   * @date    24-July-2018
