@@ -473,7 +473,7 @@ typedef struct
 #define GPIO_AF_SPI_MOSI_PD3         ((uint8_t)0x03)  /* SPI Alternate Function mapping */
 #define GPIO_AF_RTC_OUT1HZ_PD4       ((uint8_t)0x03)  /* RTC Alternate Function mapping */
 #define GPIO_AF_SPI_MISO_PD5         ((uint8_t)0x03)  /* SPI Alternate Function mapping */
-#define GPIO_AF_SPI_M0SI_PD6         ((uint8_t)0x03)  /* SPI Alternate Function mapping */
+#define GPIO_AF_SPI_MOSI_PD6         ((uint8_t)0x03)  /* SPI Alternate Function mapping */
 
 
 /** 
