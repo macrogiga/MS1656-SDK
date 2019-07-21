@@ -178,12 +178,24 @@
 
 extern void BLE_Init(void);
 extern void BLE_TRX(void);
+extern void BLE_Start(void);
 
 extern uint8_t txcnt;
 extern uint8_t rxcnt;
 
-extern uint8_t adv_data[];
-extern uint8_t rx_buf[];
+#define LEN_BLE_ADDR 6
+#define LEN_DATA 31
+extern uint8_t adv_data[LEN_DATA];
+extern uint8_t rx_buf[39];
+
+extern void BLE_Mode_PwrDn(void);
+extern void BLE_Mode_PwrUp(void);
+extern void BLE_Mode_Sleep(void);
+extern void BLE_Mode_Wakeup(void);
+extern void BLE_Set_TimeOut(uint32_t data_us);
+extern void BLE_Set_StartTime(uint32_t htime);
+extern uint8_t BLE_Get_RSSI(void);
+extern void BLE_Get_Pdu(uint8_t *ptr, uint8_t *len);
 
 #endif
 

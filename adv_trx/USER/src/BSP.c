@@ -1,22 +1,24 @@
-#include "BSP.h"
+#include "Includes.h"
 
 
 /***
 PC4=NSS,PC5=SCK,PC6=MOSI,PD2=MISO
 PB4=IRQ
 
-PD5=UART_TX, PD6=UART_RX
+PD4=UART_TX, PD3=UART_RX
 
 PC3=key1  //for demo
 PA1=LED_g //for demo
 PA2=LED_r //for demo
 
+SPIDEBUG:
+PA3=NSS,PB5=SCK,PD6=MOSI
 ***/
 
 
 void SysClock_Init(void)
 {
-    RCC->REGLOCK = 0x55aa6699;
+    RCC->REGLOCK = RCC_REGLOCKKEY;
     
     //system clock, default 4MHz
     //RCC->HIRCCR = 0x5a690d78; //24MHz
@@ -25,9 +27,15 @@ void SysClock_Init(void)
     RCC->CLKCON =  0x5a690205; //开启低频时钟
     while(!(RCC->LIRCCR&0x1000)); //LIRC_stable
     
-    RCC->REGLOCK = 0x55aa6698;
+    RCC->REGLOCK = RCC_RESGLOCKKEY;
 }
-
+/*******************************************************************************
+* Function   :      SPIM_Init
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 void SPIM_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -39,60 +47,84 @@ void SPIM_Init(void)
                     RCC_AHBPeriph_GPIOCEN   | 
                     RCC_AHBPeriph_GPIODEN;
     RCC->APBCLKEN = RCC_APBPeriph_SPICKEN   |
-                    RCC_APBPeriph_UART1CKEN |
+                    RCC_APBPeriph_UART0CKEN |
                     RCC_APBPeriph_IWDTCKEN;
     
-    //SPI_MISO :PD2
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+#ifdef BLE_SPIDEBUG
+    //IO映射调试内部BLE通讯，IRQ固定PB4
+    //SPI_NSS :PA3
+    GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_3;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_SetBits(GPIOA, GPIO_Pin_3);
+
+    //SPI_MOSI :PD6
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_Init(GPIOD,&GPIO_InitStruct);
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    //SPI_CLK :PB5
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI_CLK_PB5); //Spiclk
+    GPIO_PinAFConfig(GPIOD, GPIO_PinSource6, GPIO_AF_SPI_MOSI_PD6); //Spimosi
+#endif
+    //SPI_NSS :PC4 (software)
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_Init(GPIOC, &GPIO_InitStruct);
+    GPIO_SetBits(GPIOC, GPIO_Pin_4);
+
+    //SPI_CLK :PC5
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     //SPI_MOSI :PC6
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_Init(GPIOC,&GPIO_InitStruct);
-         
-    //SPI_CLK :PC5
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_Init(GPIOC,&GPIO_InitStruct);
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    //SPI_NSS :PC4 (software)
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    //SPI_MISO :PD2
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_2;
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_Init(GPIOC,&GPIO_InitStruct);
-    
-    GPIO_SetBits(GPIOC,GPIO_Pin_4);
-    
-    GPIO_PinAFConfig(GPIOC,GPIO_PinSource5,GPIO_AF_SPI_CLK_PC5); //Spiclk
-    GPIO_PinAFConfig(GPIOD,GPIO_PinSource2,GPIO_AF_SPI_MISO_PD2); //Spimiso
-    GPIO_PinAFConfig(GPIOC,GPIO_PinSource6,GPIO_AF_SPI_MOSI_PC6); //Spimosi
-    
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource5, GPIO_AF_SPI_CLK_PC5); //Spiclk
+    GPIO_PinAFConfig(GPIOD, GPIO_PinSource2, GPIO_AF_SPI_MISO_PD2); //Spimiso
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_SPI_MOSI_PC6); //Spimosi
+
     SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
     SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
     SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
     SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
     SPI_Init(SPI,&SPI_InitStruct);
-    SPI_Cmd(SPI,ENABLE);
-    
-    GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_4;   //irq
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_Init(GPIOB,&GPIO_InitStruct);
+    SPI_Cmd(SPI,ENABLE);   
 }
 
+#define UARTx UART0
+#define TIMx  TIM10
 void UART_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -101,23 +133,22 @@ void UART_Config(void)
     //将USART Rx的GPIO配置为推挽复用模式
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_3;
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Low_Speed;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
     GPIO_Init(GPIOD,&GPIO_InitStruct);
 
-    
     //将USART Tx的GPIO配置为推挽复用模式
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Low_Speed;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
     GPIO_Init(GPIOD,&GPIO_InitStruct);
     
     //uart GPIO管脚配置
-    GPIO_PinAFConfig(GPIOD,GPIO_PinSource6,GPIO_AF_UART1_RX_PD6); //RX
-    GPIO_PinAFConfig(GPIOD,GPIO_PinSource5,GPIO_AF_UART1_TX_PD5); //TX
+    GPIO_PinAFConfig(GPIOD, GPIO_PinSource3, GPIO_AF_UART0_RX_PD3); //RX
+    GPIO_PinAFConfig(GPIOD, GPIO_PinSource4, GPIO_AF_UART0_TX_PD4); //TX
 
     // 配置串口的工作参数
     // 配置波特率
@@ -130,19 +161,26 @@ void UART_Config(void)
     UART_InitStructure.UART_Mode = UART_MODE1;
 
     // 完成串口的初始化配置
-    UART_Init(UART1,TIM11, &UART_InitStructure);
+    UART_Init(UART0, TIMx, &UART_InitStructure);
     
     // 串口中断优先级配置
     //NVIC_Configuration();
 
     // 使能串口中断*/
-    UART_ITConfig(UART1,UART_RIEN_EABLE,ENABLE);
-    UART_ITConfig(UART1,UART_TIEN_EABLE,ENABLE);
+    UART_ITConfig(UART0, UART_RIEN_EABLE, ENABLE);
+    UART_ITConfig(UART0, UART_TIEN_EABLE, ENABLE);
 
     // 使能串口
-    UART_Cmd(UART1,UART_RXEN_EABLE,ENABLE);
+    UART_Cmd(UART0, UART_RXEN_EABLE, ENABLE);
 }
 
+/*******************************************************************************
+* Function   :      LED_KEY_Config
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 static void LED_KEY_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -167,6 +205,13 @@ static void LED_KEY_Config(void)
     GPIO_Init(KEY1_GPIO_PORT, &GPIO_InitStruct);
 }
 
+/*******************************************************************************
+* Function   :      RTCInit
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 void RTCInit(void)
 {
     RTC_InitTypeDef RTC_InitStruct;
@@ -192,6 +237,13 @@ void RTCInit(void)
     RTC_CountCmd(RTC,ENABLE);
 }
 
+/*******************************************************************************
+* Function   :      IWDG_Config
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 static void IWDG_Config(void)
 {
     /*打开写保护*/
@@ -202,19 +254,58 @@ static void IWDG_Config(void)
     IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
 }
 
+/*******************************************************************************
+* Function   :      BSP_Init
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 void BSP_Init(void)
 {
+    GPIO_InitTypeDef GPIO_InitStruct;
+    NVIC_InitTypeDef NVIC_InitStruct;
+    GPI0_IRQ_InitTypeDef GPIO_IRQ_InitStruct;
+    
     SysClock_Init();
     
     SPIM_Init();
+    
+    GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_4;   //irq
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+#ifdef WMODE_INT    /*EXIT中断设置*/
+    GPIO_IRQ_InitStruct.GPI0_IRQ_Pin_Type = DISABLE;        //0-边沿触发，1-电平触发
+    GPIO_IRQ_InitStruct.GPI0_IRQ_Pin_Polarity = DISABLE;     //0-低电平或下降沿触发，1-高电平或上升沿触发
+    GPIO_IRQ_InitStruct.GPI0_IRQ_Pin_Edge =  DISABLE;       //0-由上两个寄存器决定，1-上升沿和下降沿都触发中断
+    GPIO_IRQ_InitStruct.GPI0_IRQ_Pin_Clear = ENABLE;        //1-清中断标志
+    GPIO_IRQ_InitStruct.GPI0_IRQ_Pin_Enable = ENABLE;
+    GPIO_EXTILineConfig(GPIOB,&GPIO_IRQ_InitStruct,GPIO_Pin_4);
+    
+    NVIC_InitStruct.NVIC_IRQChannel = GPIOB_IRQn;
+    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 2;
+    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStruct);
+#endif
+
     UART_Config();
     RTCInit();
     
     LED_KEY_Config();
     
-    IWDG_Config();
+//    IWDG_Config();
 }
 
+/*******************************************************************************
+* Function   :      Uart_Send_Byte
+* Parameter  :      uint8_t data
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 void Uart_Send_Byte(char data)
 {
     uint8_t temp;
@@ -228,33 +319,47 @@ void Uart_Send_Byte(char data)
     temp0[1] = Hex2Ascii(temp);
 
     //usart send data
-    UART_SendData(UART1,temp0[1]);
+    UART_SendData(UARTx,temp0[1]);
 
     /* Wait until end of transmit */
-    while(UART_GetITStatus(UART1, UART_ISR_TI) !=  SET);
-    UART_ClearITBit(UART1, UART_ISR_TI);
+    while(UART_GetITStatus(UARTx, UART_ISR_TI) !=  SET);
+    UART_ClearITBit(UARTx, UART_ISR_TI);
 
-    UART_SendData(UART1,temp0[0]);
+    UART_SendData(UARTx,temp0[0]);
     /* Wait until end of transmit */
-    while(UART_GetITStatus(UART1, UART_ISR_TI) !=  SET);
-    UART_ClearITBit(UART1, UART_ISR_TI);
+    while(UART_GetITStatus(UARTx, UART_ISR_TI) !=  SET);
+    UART_ClearITBit(UARTx, UART_ISR_TI);
 }
+
+/*******************************************************************************
+* Function   :      Uart_Send_String
+* Parameter  :      uint8_t *data
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 void Uart_Send_String(char *data)
 {
     //check string end char
     while(*data != '\0')
     {
-        UART_SendData(UART1,*data);
+        UART_SendData(UARTx,*data);
 
         /* Wait until end of transmit */
-        while(UART_GetITStatus(UART1, UART_ISR_TI) !=  SET);
-        UART_ClearITBit(UART1, UART_ISR_TI);
+        while(UART_GetITStatus(UARTx, UART_ISR_TI) !=  SET);
+        UART_ClearITBit(UARTx, UART_ISR_TI);
         
         data++;	
     }
 }
 
-
+/*******************************************************************************
+* Function   :      KEY_GET
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 char KEY_GET(void)
 {
     return (!GPIO_ReadInputDataBit(KEY1_GPIO_PORT, KEY1_GPIO_PORT_PIN));
@@ -277,6 +382,13 @@ void LED_GREEN_OFF(void)
     GPIO_ResetBits(LED1_GPIO_PORT, LED1_GPIO_PORT_PIN);
 }
 
+/*******************************************************************************
+* Function   :      SysTick_Handler
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 unsigned short tick = 0;
 
 void SysTick_Handler(void)
@@ -285,9 +397,19 @@ void SysTick_Handler(void)
     if(tick>0) tick--;
 }
 
+/*******************************************************************************
+* Function   :      RTC_MATCH0_IRQHandler
+* Parameter  :      void
+* Returns    :      void
+* Description:
+* Note:      :
+*******************************************************************************/
 void RTC_MATCH0_IRQHandler(void)
 {
     RTC_ClearFlag(RTC,RTC_IT_ALM2);
+#ifdef WMODE_INT    
+    BLE_Start();
+#endif
 }
 
 void Delay_ms(uint16_t delayCnt)

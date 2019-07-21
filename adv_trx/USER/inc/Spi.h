@@ -6,8 +6,13 @@
 
 #define BLE_IRQ_GET()    (GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_4))
 
-#define BLE_CSN_CLR()    GPIO_ResetBits(GPIOC,GPIO_Pin_4)
-#define BLE_CSN_SET()    GPIO_SetBits(GPIOC,GPIO_Pin_4)
+#ifdef  BLE_DEBUG
+  #define BLE_CSN_CLR()    GPIO_ResetBits(GPIOA,GPIO_Pin_3);GPIO_ResetBits(GPIOC,GPIO_Pin_4)
+  #define BLE_CSN_SET()    GPIO_SetBits(GPIOA,GPIO_Pin_3);GPIO_SetBits(GPIOC,GPIO_Pin_4)
+#else
+  #define BLE_CSN_CLR()    GPIO_ResetBits(GPIOC,GPIO_Pin_4)
+  #define BLE_CSN_SET()    GPIO_SetBits(GPIOC,GPIO_Pin_4)
+#endif
 
 extern uint8_t SPI_Write_Byte(uint8_t data1) ;
 extern uint8_t SPI_Read_Byte(void) ;

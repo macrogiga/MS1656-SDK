@@ -235,7 +235,7 @@ void Carrier(unsigned char freq)
 void RXTest(unsigned char freq)
 {
     unsigned long delay=0x14000;
-    unsigned char temp[32];
+ //   unsigned char temp[32];
 
     SPI_Write_Reg(0x50, 0x51);
     

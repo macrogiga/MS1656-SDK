@@ -18,7 +18,7 @@
 
 
 /* Private macro -------------------------------------------------------------*/
-#define LEN_BLE_ADDR 6
+//#define LEN_BLE_ADDR 6
 
 
 /* Private variables ---------------------------------------------------------*/
@@ -27,7 +27,7 @@ extern unsigned short tick;
 unsigned char rx_buf[39]; //include header(2B)+mac(6B)+data(max31B), for rx application
 
 //BLE ADV_data, maxlen=31
-#define LEN_DATA 31
+//#define LEN_DATA 31
 uint8_t adv_data[31] = {0x02,0x01,0x04, 0x1a,0xff,0x4c,0x00,2,0x15, 0xfd,0xa5,0x06,0x93,0xa4,0xe2,0x4f,0xb1,0xaf,0xcf,0xc6,0xeb,0x07,0x64,0x78,0x25, 0x27,0x32,0x52,0xb0, 0xB6, 0};
 
 
@@ -140,7 +140,7 @@ void BLE_Set_TimeOut(uint32_t data_us)
 }
 
 /*called when pdu received, 1dB*/
-static uint8_t BLE_Get_RSSI(void)
+uint8_t BLE_Get_RSSI(void)
 {
     uint8_t rssi = 0;
     SPI_Write_Reg(0x50, 0x53);
@@ -149,7 +149,7 @@ static uint8_t BLE_Get_RSSI(void)
     return rssi;
 }
 
-static void BLE_Get_Pdu(uint8_t *ptr, uint8_t *len)
+void BLE_Get_Pdu(uint8_t *ptr, uint8_t *len)
 {
     uint8_t hdr_type;
     uint8_t len_tmp;
@@ -205,7 +205,8 @@ static void BLE_Get_Pdu(uint8_t *ptr, uint8_t *len)
     }
 
     if(len_tmp > 0){
-        SPI_Read_Buffer(R_RX_PAYLOAD, &ptr[2+LEN_BLE_ADDR], len_tmp);
+        if(len_tmp <= 31)
+            SPI_Read_Buffer(R_RX_PAYLOAD, &ptr[2+LEN_BLE_ADDR], len_tmp);
     }
 }
 

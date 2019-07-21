@@ -11,8 +11,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "Includes.h"
 
-
-
+/*******************************************************************************
+* Function   :      SPI_Write_Byte
+* Parameter  :      uint8_t SendData
+* Returns    :      uint8_t
+* Description:
+* Note:      :
+*******************************************************************************/
 uint8_t SPI_Write_Byte(unsigned char SendData)
 {
     SPI_SendData(SPI,SendData);
