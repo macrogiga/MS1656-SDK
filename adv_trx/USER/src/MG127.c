@@ -337,7 +337,7 @@ void BLE_Init(void)
     SPI_Write_Buffer(0x0f,data_buf,2);
 
     data_buf[1] = SPI_Read_Reg(0x08);  //txgain
-    if(0 == data_buf[1]){
+    if((11 > data_buf[1])||(25 < data_buf[1])){
         data_buf[1] = TXGAIN_DEF;
     }
     data_buf[0] = 0xc0;
