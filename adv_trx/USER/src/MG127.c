@@ -30,6 +30,7 @@ unsigned char rx_buf[39]; //include header(2B)+mac(6B)+data(max31B), for rx appl
 //#define LEN_DATA 31
 uint8_t adv_data[31] = {0x02,0x01,0x04, 0x1a,0xff,0x4c,0x00,2,0x15, 0xfd,0xa5,0x06,0x93,0xa4,0xe2,0x4f,0xb1,0xaf,0xcf,0xc6,0xeb,0x07,0x64,0x78,0x25, 0x27,0x32,0x52,0xb0, 0xB6, 0};
 
+unsigned char * const TxgainPt=(unsigned char *)0x18000040;
 
 /* Private function prototypes -----------------------------------------------*/
 void BLE_Do_Cal(void);
@@ -336,7 +337,7 @@ void BLE_Init(void)
     data_buf[1] = BLE_TX_POWER;
     SPI_Write_Buffer(0x0f,data_buf,2);
 
-    data_buf[1] = SPI_Read_Reg(0x08);  //txgain
+    data_buf[1] = *TxgainPt;
     if((11 > data_buf[1])||(25 < data_buf[1])){
         data_buf[1] = TXGAIN_DEF;
     }
