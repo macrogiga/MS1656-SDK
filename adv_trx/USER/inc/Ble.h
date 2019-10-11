@@ -37,9 +37,9 @@
 #define	BLE_TX_POWER_3dbm	64
 #define	BLE_TX_POWER0dbm	67
 #define	BLE_TX_POWER3dbm	72
+#define	BLE_TX_POWER5dbm	74
 
-
-#define BLE_TX_POWER		BLE_TX_POWER0dbm
+#define BLE_TX_POWER		BLE_TX_POWER5dbm
 
 /*-------------------------------BLE register---------------------------------*/
 //set advertise channel number 37 38 39

@@ -335,7 +335,8 @@ void BLE_Init(void)
     //set BLE TX Power
     data_buf[0] = 0x02;
     data_buf[1] = BLE_TX_POWER;
-    SPI_Write_Buffer(0x0f,data_buf,2);
+    data_buf[2] = 0x52;
+    SPI_Write_Buffer(0x0f,data_buf,3);
 
     data_buf[1] = *TxgainPt;
     if((11 > data_buf[1])||(25 < data_buf[1])){
@@ -355,7 +356,7 @@ void BLE_Init(void)
     SPI_Write_Buffer(0x13, data_buf, 2);
 
     SPI_Write_Reg(0X21, 0x02);
-    SPI_Write_Reg(0x3C, 0x30);
+    SPI_Write_Reg(0x3C, 0x00);
     SPI_Write_Reg(0x3E, 0x30);
 
     data_buf[0] = 0x38;
