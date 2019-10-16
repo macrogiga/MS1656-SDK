@@ -24,7 +24,7 @@
 64 -- -3 dBm
 67 --  0 dBm
 72 --  3 dBm
-74 --  4 dBm
+74 --  5 dBm
 #define
 */
 #define	BLE_TX_POWER_54dbm	0
