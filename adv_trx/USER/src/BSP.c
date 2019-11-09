@@ -15,19 +15,30 @@ SPIDEBUG:
 PA3=NSS,PB5=SCK,PD6=MOSI
 ***/
 
+#define trim_24M    (*((volatile uint16_t*)(0x180000C0))&0x0fff);
+#define trim_22M    (*((volatile uint16_t*)(0x180000C2))&0x0fff);
+#define trim_16M    (*((volatile uint16_t*)(0x180000C4))&0x0fff);
+#define trim_8M     (*((volatile uint16_t*)(0x180000C6))&0x0fff);
+#define trim_4M     (*((volatile uint16_t*)(0x180000C8))&0x0fff);
+//#define HIRC24M_FLASHADDR					0x180000C0
+//#define HIRC22M_FLASHADDR					0x180000C2
+//#define HIRC16M_FLASHADDR					0x180000C4
+//#define HIRC8M_FLASHADDR					0x180000C6
+//#define HIRC4M_FLASHADDR					0x180000C8
 
 void SysClock_Init(void)
 {
     RCC->REGLOCK = RCC_REGLOCKKEY;
     
     //system clock, default 4MHz
-    //RCC->HIRCCR = 0x5a690d78; //24MHz
-    SysTick_Config(4000);
-    
+    //RCC->HIRCCR = 0x5a690000+trim_24M;  //system clock:24MHz
     RCC->CLKCON =  0x5a690205; //¿ªÆôµÍÆµÊ±ÖÓ
     while(!(RCC->LIRCCR&0x1000)); //LIRC_stable
     
     RCC->REGLOCK = RCC_RESGLOCKKEY;
+    
+    SysTick_Config(4000); //4M
+    //SysTick_Config(24000); //24M
 }
 /*******************************************************************************
 * Function   :      SPIM_Init
