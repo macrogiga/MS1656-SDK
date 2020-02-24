@@ -49,25 +49,25 @@ void GPIO_EXTILineConfig(GPIO_TypeDef* GPIOx,GPI0_IRQ_InitTypeDef* GPIO_IRQ_Init
 	
 	/*!<Specifies the speed for the selected pins*/
 	if(GPIO_IRQ_InitStructure->GPI0_IRQ_Pin_Type) 
-		GPIOx->ITYP = GPIO_Pin;
+		GPIOx->ITYP |= GPIO_Pin;
 	else
 		GPIOx->ITYP  &= ~GPIO_Pin;
 	
 	/*!<Specifies the operating output type for the selected pins*/
 	if(GPIO_IRQ_InitStructure->GPI0_IRQ_Pin_Polarity) 
-		GPIOx->IVAL = GPIO_Pin;
+		GPIOx->IVAL |= GPIO_Pin;
 	else
 		GPIOx->IVAL  &= ~GPIO_Pin;
 	
 	/*!<Specifies the operating Pull-up/Pull down for the selected pins*/
 	if(GPIO_IRQ_InitStructure->GPI0_IRQ_Pin_Edge) 
-		GPIOx->IANY = GPIO_Pin;
+		GPIOx->IANY |= GPIO_Pin;
 	else
 		GPIOx->IANY  &= ~GPIO_Pin;
 	
 	/*!<Specifies the operating mode for the selected pins*/
 	if(GPIO_IRQ_InitStructure->GPI0_IRQ_Pin_Clear)  
-		GPIOx->ICLR = GPIO_Pin;
+		GPIOx->ICLR |= GPIO_Pin;
 	else
 		GPIOx->ICLR &= ~GPIO_Pin;
 	

@@ -603,6 +603,18 @@ typedef struct
 	__IO uint32_t MIS;
 } ADC_TypeDef;
 
+typedef struct
+{
+	__IO uint32_t CR;
+	__IO uint32_t IFR;
+	__IO uint32_t ICLR;
+	__IO uint32_t BYPASS;
+	__IO uint32_t SLOCK0;
+	__IO uint32_t SLOCK1;
+	__IO uint32_t ISPCON;
+	
+} FLASH_TypeDef;
+
 /*------------------------------------------------------------------------------------------------*/
 /*                                                                                                */
 /*           BASE ADDRESS DEFINE, DEFINE ALL MODE.....                                               */
@@ -643,7 +655,7 @@ typedef struct
 #define VC_BASE         (PERIPH_BASE + 0x00004080)
 #define DEBUG_BASE      (PERIPH_BASE + 0x00004C00)
 #define ADC_BASE        (PERIPH_BASE + 0x00002C00)
-
+#define FLASH_BASE      (PERIPH_BASE + 0x00020400)
 
 
 
@@ -684,7 +696,7 @@ typedef struct
 #define LPUART              ((LPUART_TypeDef *)LPUART_BASE) 
 #define DEBUG               ((DEBUG_TypeDef *)DEBUG_BASE) 
 #define ADC                 ((ADC_TypeDef *)ADC_BASE) 
-
+#define FLASH               ((FLASH_TypeDef *)FLASH_BASE) 
 
 
 
