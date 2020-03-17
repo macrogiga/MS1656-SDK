@@ -243,9 +243,11 @@ void RTCInit(void)
     RTC_AlarmCmd(RTC,RTC_IT_ALMEN, ENABLE);
 
     NVIC_EnableIRQ(RTC_MATCH0_IRQn);
-    NVIC_SetPriority(RTC_MATCH0_IRQn,4);
+    NVIC_SetPriority(RTC_MATCH0_IRQn,2);
 
     RTC_CountCmd(RTC,ENABLE);
+    
+    RTC_Init(RTC,&RTC_InitStruct);
 }
 
 /*******************************************************************************
@@ -418,7 +420,7 @@ void SysTick_Handler(void)
 void RTC_MATCH0_IRQHandler(void)
 {
     RTC_ClearFlag(RTC,RTC_IT_ALM2);
-#ifdef WMODE_INT    
+#ifdef WMODE_INT
     BLE_Start();
 #endif
 }
